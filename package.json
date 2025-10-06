@@ -1,0 +1,12 @@
+{
+  "name": "player-changer-api",
+  "version": "1.0.0",
+  "description": "API for changing player ID in ProjectData_slot bytes file.",
+  "scripts": {
+    "start": "node api/change.js"
+  },
+  "dependencies": {
+    "micro": "9.4.1",
+    "multiparty": "4.2.3"
+  }
+}

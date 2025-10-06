@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Changer Tool by SSFYT</title>
+    <style>
+        /* CSS: UI style white aur bold */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5; 
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 10px; 
+        }
+
+        .container {
+            background-color: #ffffff; 
+            padding: 30px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            color: #333; 
+        }
+
+        h2 {
+            color: #333;
+            font-size: 24px; 
+            font-weight: bold;
+            margin-top: 5px;
+            margin-bottom: 30px;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        
+        .input-group {
+            text-align: left;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600; 
+            color: #333; 
+            font-size: 15px;
+        }
+
+        .bytes-highlight {
+            color: #4CAF50; 
+            font-weight: normal;
+        }
+
+        input[type="file"], select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            box-sizing: border-box; 
+            font-size: 16px;
+            background-color: #fff; 
+            color: #333; 
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: bold;
+            font-size: 18px;
+            background-color: #007bff; 
+            color: white; 
+        }
+
+        button:hover {
+            background-color: #0069d9;
+        }
+        
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        #processingArea {
+            margin-top: 30px;
+            padding: 15px;
+            border: 1px solid #adb5bd; 
+            border-radius: 8px;
+            background-color: #f8f9fa; 
+            display: none;
+            color: #333;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress {
+            height: 100%;
+            width: 100%; 
+            background-color: #007bff;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            transition: width 0.5s;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 14px;
+            color: #6c757d; 
+        }
+        .footer a {
+            color: #333; 
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .footer a:hover {
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <h2>Player Changer Tool</h2>
+    
+    <div class="input-group">
+        <label for="projectFile">Upload <span class="bytes-highlight">ProjectData_slot .bytes</span> File</label>
+        <input type="file" id="projectFile" accept=".bytes">
+    </div>
+
+    <div class="input-group">
+        <label for="selectPlayer">Select Player</label>
+        <select id="selectPlayer">
+            <option value="1">Player 1</option>
+            <option value="2">Player 2</option>
+            <option value="3">Player 3</option>
+            <option value="4">Player 4</option>
+            <option value="5">Player 5</option>
+            <option value="6">Player 6</option>
+            <option value="7">Player 7</option>
+            <option value="8">Player 8</option>
+            <option value="9">Player 9</option>
+            <option value="10">Player 10</option>
+        </select>
+    </div>
+
+    <button id="downloadButton">Download</button>
+
+    <div id="processingArea">
+        <p id="processingText">Processing... Please wait.</p>
+        <div class="progress-bar">
+            <div class="progress" id="progressBarValue">...API Se Kaam Ho Raha Hai...</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2025 Copyright 
+        <a href="https://youtube.com/@ssfyt_777?si=9JBqTAd9bgnNvT8F" target="_blank">
+            SSFYT
+        </a>
+    </div>
+</div>
+
+<script>
+    // 📢 Yahan woh Nayi Live Server Link Dalen Jo Aapko Milegi!
+    // Filhal hum wahi purani link rakhenge, jab tak aap naya nahi dete.
+    const API_URL = 'https://ffcl.vercel.app/api/player'; 
+
+    const downloadButton = document.getElementById('downloadButton');
+    const projectFile = document.getElementById('projectFile');
+    const selectPlayer = document.getElementById('selectPlayer');
+    const processingArea = document.getElementById('processingArea');
+    const processingText = document.getElementById('processingText');
+
+    downloadButton.addEventListener('click', async () => {
+        if (projectFile.files.length === 0) {
+            alert("Kripya ProjectData_slot .bytes file upload karein.");
+            return;
+        }
+
+        // Processing shuru (UI update)
+        downloadButton.disabled = true;
+        downloadButton.textContent = "Uploading...";
+        processingArea.style.display = 'block';
+        processingText.textContent = "Uploading file and processing...";
+        
+        const formData = new FormData();
+        formData.append('file', projectFile.files[0]);
+        formData.append('player', selectPlayer.value);
+
+        try {
+            // API ko data bhejna (POST Request)
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                body: formData 
+            });
+
+            if (!response.ok) {
+                // Agar API se koi error code (jaise 404, 500) aata hai
+                let errorMessage = `Server Error: ${response.status}`;
+                try {
+                    const errorJson = await response.json();
+                    errorMessage = `API Error ${response.status}: ${errorJson.message || JSON.stringify(errorJson).substring(0, 100)}`;
+                } catch {
+                    const errorText = await response.text();
+                    errorMessage = `API Error ${response.status}. Response: ${errorText.substring(0, 50)}...`;
+                }
+                throw new Error(errorMessage);
+            }
+
+            // Response type check karna (Zaroori)
+            const contentType = response.headers.get("Content-Type");
+            if (!contentType || (!contentType.includes("octet-stream") && !contentType.includes("application/octet-stream") && !contentType.includes("binary"))) {
+                const textResponse = await response.text();
+                 throw new Error(`Unexpected API response type. Received Content-Type: ${contentType}. Start of response: ${textResponse.substring(0, 50)}...`);
+            }
+            
+            // Modified file ko Blob ke roop mein receive karna
+            processingText.textContent = "Processing Complete. Downloading file...";
+            const modifiedFileBlob = await response.blob(); 
+            
+            // Download shuru karna
+            const url = window.URL.createObjectURL(modifiedFileBlob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `Modified_Player_${selectPlayer.value}_Data.bytes`; 
+            document.body.appendChild(a);
+            a.click(); 
+            window.URL.revokeObjectURL(url);
+
+            // Success message
+            processingText.textContent = "Download Successful! Check your downloads folder.";
+            downloadButton.textContent = "Download Complete";
+
+        } catch (error) {
+            // Error handling
+            console.error(error);
+            processingText.textContent = `Error: ${error.message}. Kripya Nayi API Status Check Karein.`;
+            alert(`Aapka kaam poora nahi ho paya: ${error.message}`);
+            downloadButton.textContent = "Download Failed";
+        } finally {
+            downloadButton.disabled = false;
+        }
+    });
+</script>
+
+</body>
+</html>
